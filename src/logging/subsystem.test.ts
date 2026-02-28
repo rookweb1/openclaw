@@ -54,3 +54,22 @@ describe("createSubsystemLogger().isEnabled", () => {
     expect(log.isEnabled("info")).toBe(true);
   });
 });
+
+describe("file logging respects level setting", () => {
+  it("does not write to file when level is set to info and message is debug", () => {
+    // This tests the fix for issue #29448
+    setLoggerOverride({ level: "info", consoleLevel: "silent" });
+    const log = createSubsystemLogger("test/subsystem");
+
+    // isEnabled should return false for debug to file
+    expect(log.isEnabled("debug", "file")).toBe(false);
+  });
+
+  it("writes to file when level is set to debug", () => {
+    setLoggerOverride({ level: "debug", consoleLevel: "silent" });
+    const log = createSubsystemLogger("test/subsystem");
+
+    // isEnabled should return true for debug to file
+    expect(log.isEnabled("debug", "file")).toBe(true);
+  });
+});
